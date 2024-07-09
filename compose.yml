@@ -1,0 +1,20 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8000:5000"
+    develop:
+      watch: # Use watch as I work locally and see live changes
+        - action: sync
+          path: ./website
+          target: /code/website
+    command: ["gunicorn", "--reload", "-w", "4", "-b", "0.0.0.0:5000", "website.app:app"] # website/app is module and app specifies the name of the callable object within the module that represents our WSGI application.
+
+  jupyter:
+    build: .
+    ports:
+      - "8888:8888"
+    volumes: # Use mount binding as I work while running container and want data to persist. Plus, even local changes appear live without restarting container
+      - ./notebooks:/code/notebooks
+    command: ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''", "--NotebookApp.password=''", "--NotebookApp.allow_origin='*'", "--NotebookApp.allow_remote_access=True"]
+
